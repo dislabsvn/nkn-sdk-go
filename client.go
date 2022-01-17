@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
@@ -554,8 +555,10 @@ func (c *Client) connectToNode(node *Node) error {
 	}
 
 	wsAddr := (&url.URL{Scheme: "ws", Host: node.Addr}).String()
-	dialer := websocket.DefaultDialer
-	dialer.HandshakeTimeout = time.Duration(c.config.WsHandshakeTimeout) * time.Millisecond
+	dialer := &websocket.Dialer{
+		Proxy:            http.ProxyFromEnvironment,
+		HandshakeTimeout: time.Duration(c.config.WsHandshakeTimeout) * time.Millisecond,
+	}
 
 	conn, _, err := dialer.Dial(wsAddr, nil)
 	if err != nil {
