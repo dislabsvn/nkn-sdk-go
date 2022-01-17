@@ -405,7 +405,9 @@ func (c *Client) handleMessage(msgType int, data []byte) error {
 			if err := json.Unmarshal(*msg["Result"], &result); err != nil {
 				return err
 			}
+			c.lock.Lock()
 			c.sigChainBlockHash = result.SigChainBlockHash
+			c.lock.Unlock()
 
 			c.lock.RLock()
 			defer c.lock.RUnlock()
@@ -420,7 +422,9 @@ func (c *Client) handleMessage(msgType int, data []byte) error {
 			if err := json.Unmarshal(*msg["Result"], &sigChainBlockHash); err != nil {
 				return err
 			}
+			c.lock.Lock()
 			c.sigChainBlockHash = sigChainBlockHash
+			c.lock.Unlock()
 		}
 	case websocket.BinaryMessage:
 		clientMsg := &pb.ClientMessage{}
